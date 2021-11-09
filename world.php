@@ -13,19 +13,19 @@ $password = 'password123';
 $dbname = 'world';
 
 $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-$stmt = $conn->query(" SELECT cities.name as city_name, cities.country_code, cities.district,
+$stmt = $conn->query(" SELECT DISTINCT cities.name as city_name, cities.country_code, cities.district,
 cities.population,countries.name as country_name, countries.continent,countries.independence_year,countries.head_of_state FROM cities join countries on
 cities.country_code = countries.code WHERE countries.name LIKE '%$country%';");
 
-// $stmt = $conn->query("SELECT * FROM countries WHERE name LIKE '%$country%';");
+$country_only = $conn->query("SELECT * FROM countries WHERE countries.name LIKE '%$country%';");
 
-
+$only_country_results = $country_only->fetchAll(PDO::FETCH_ASSOC);
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <?php if(empty($cities)): ?>
   <?=$cities?>
-  <table>
+  <table  class="styled-table">
     <tr>
       <th>Country Name</th>
       <th>Continent</th>
@@ -33,9 +33,9 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <th>Head of State</th>
     </tr>
 
-    <?php foreach ($results as $row): ?>
+    <?php foreach ($only_country_results as $row): ?>
       <tr>
-        <td><?=$row['country_name']?></td>
+        <td><?=$row['name']?></td>
         <td><?=$row['continent']?></td>
         <td><?=$row['independence_year']?></td>
         <td><?=$row['head_of_state']?></td>
@@ -45,9 +45,9 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </table>
 
 <?php else: ?>
-  <table>
+  <table   class="styled-table">
     <tr>
-      <th>Country Name</th>
+      <th>Name</th>
       <th>District</th>
       <th>Population</th>
     </tr>
